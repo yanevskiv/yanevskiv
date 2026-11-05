@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+    cat <<EOF
+Usage: $0 [OPTIONS] -o OUTPUT TITLE
+
+Create a project banner using res/img/project_banner_background.jpg.
+
+Options:
+  -h, --help    Show this help and exit.
+  -b BACKGROUND Background image (default: res/img/project_banner_background.jpg)
+  -o OUTPUT     Output image (required)
+  -f FONT       Font file (default: Ubuntu Mono Bold via fontconfig)
+  -s SIZE       Font size (default: 134)
+  -x X          Horizontal title position (default: 45)
+  -y Y          Vertical title position (default: 58)
+  -c COLOR      Text color (default: white)
+  -C COLOR      Shadow color (default: gray)
+  -S GEOMETRY   Shadow geometry: OPACITYxBLUR+X+Y (default: 85x1+4+4)
+
+Use -- to end options before a TITLE beginning with a dash.
+EOF
+}
+
+font=''
+background=''
+output=''
+size=134
+x=45
+y=58
+color=white
+shadow_color=gray
+shadow=85x1+4+4
+
+while getopts ':hb:o:f:s:x:y:c:C:S:-:' option; do
+    case "$option" in
+        h) usage; exit 0 ;;
+        b) background=$OPTARG ;;
+        o) output=$OPTARG ;;
+        f) font=$OPTARG ;;
+        s) size=$OPTARG ;;
+        x) x=$OPTARG ;;
+        y) y=$OPTARG ;;
+        c) color=$OPTARG ;;
+        C) shadow_color=$OPTARG ;;
+        S) shadow=$OPTARG ;;
+        -)
+            case "$OPTARG" in
+                help) usage; exit 0 ;;
+                *) echo "Unknown option: --$OPTARG" >&2; usage >&2; exit 1 ;;
+            esac
+            ;;
+        :) echo "Option -$OPTARG requires an argument." >&2; usage >&2; exit 1 ;;
+        \?) echo "Unknown option: -$OPTARG" >&2; usage >&2; exit 1 ;;
+    esac
+done
+shift "$((OPTIND - 1))"
+
+if (( $# != 1 )) || [[ -z "$output" ]]; then
+    usage >&2
+    exit 1
+fi
+command -v magick >/dev/null || { echo 'ImageMagick 7 (magick) is required.' >&2; exit 1; }
+
+script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+background=${background:-"$script_dir/../res/img/project_banner_background.jpg"}
+[[ -f "$background" ]] || { echo "Background file not found: $background" >&2; exit 1; }
+# Keep leading dashes in local filenames out of ImageMagick's option parser.
+[[ $background != -* ]] || background="./$background"
+[[ $output != -* ]] || output="./$output"
+
+font=${font:-$(fc-match -f '%{file}' 'Ubuntu Mono:style=Bold')}
+[[ -f "$font" ]] || { echo "Font file not found: $font" >&2; exit 1; }
+
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+# Expand a stored option once, keeping the title out of ImageMagick's file syntax.
+magick -background none -fill "$color" -font "$font" -pointsize "$size" \
+    -set option:banner-title "$1" 'label:%[option:banner-title]' \
+    -trim +repage "$tmp/text.png"
+magick "$tmp/text.png" \
+    \( +clone -background "$shadow_color" -shadow "$shadow" \) \
+    +swap -background none -layers merge +repage "$tmp/title.png"
+magick "$background" "$tmp/title.png" -gravity NorthWest -geometry "+${x}+${y}" \
+    -compose Over -composite -quality 95 "$output"

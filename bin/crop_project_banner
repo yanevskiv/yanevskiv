@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+    cat <<EOF
+Usage: $0 [OPTIONS] -o OUTPUT INPUT
+
+Crop an image into a project banner without resizing.
+
+Options:
+  -h, --help   Show this help and exit.
+  -o OUTPUT    Output image (required)
+  -g GEOMETRY  Crop geometry: WIDTHxHEIGHT+X+Y (default: 1080x204+0+0)
+
+The input is auto-oriented before cropping from the top-left corner.
+Use -- to end options before an INPUT beginning with a dash.
+
+Example: $0 -g 1080x204+0+0 -o banner-bg.jpg bg-code-dark.jpg
+EOF
+}
+
+output=''
+geometry=1080x204+0+0
+
+while getopts ':ho:g:-:' option; do
+    case "$option" in
+        h) usage; exit 0 ;;
+        o) output=$OPTARG ;;
+        g) geometry=$OPTARG ;;
+        -)
+            case "$OPTARG" in
+                help) usage; exit 0 ;;
+                *) echo "Unknown option: --$OPTARG" >&2; usage >&2; exit 1 ;;
+            esac
+            ;;
+        :) echo "Option -$OPTARG requires an argument." >&2; usage >&2; exit 1 ;;
+        \?) echo "Unknown option: -$OPTARG" >&2; usage >&2; exit 1 ;;
+    esac
+done
+shift "$((OPTIND - 1))"
+
+if (( $# != 1 )) || [[ -z "$output" ]]; then
+    usage >&2
+    exit 1
+fi
+command -v magick >/dev/null || { echo 'ImageMagick 7 (magick) is required.' >&2; exit 1; }
+
+input=$1
+[[ -f "$input" ]] || { echo "Input file not found: $input" >&2; exit 1; }
+# Keep leading dashes in local filenames out of ImageMagick's option parser.
+[[ $input != -* ]] || input="./$input"
+[[ $output != -* ]] || output="./$output"
+
+# ImageMagick crop geometry: WIDTHxHEIGHT+X+Y. No resizing is performed.
+magick "$input" -auto-orient -gravity NorthWest -crop "$geometry" +repage "$output"

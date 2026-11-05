@@ -1,4 +1,12 @@
+<div align="center">
+
 ![Ivan's Github!](res/img/ivans-github.jpg)
+
+[![Ivan's LinkedIn](https://img.shields.io/badge/Ivan-LinkedIn-blue?style=for-the-badge)](https://www.linkedin.com/in/yanevskiv)
+[![Ivan's LinkedIn](https://img.shields.io/badge/Ivan-Website-brown?style=for-the-badge)](https://yanevskiv.com/)
+[![Ivan's LinkedIn](https://img.shields.io/badge/Ivan-Github-black?style=for-the-badge)](https://github.com/yanevskiv)
+
+</div>
 
 Hi, I'm Ivan! This is my Github account, which contains my personal projects.
 My projects usually involve writing low-level software written in C or modern C++. 
@@ -18,10 +26,3 @@ You can contact me on Linkedin: [in/yanevskiv](https://www.linkedin.com/in/yanev
   <a href="https://github.com/yanevskiv/ivss"><picture><source media="(prefers-color-scheme: dark)" srcset="res/projects/ivss-dark.svg"><img src="res/projects/ivss-light.svg" width="350" alt="ivss — assembler, linker and emulator for a 32-bit CPU"></picture></a>
 </div>
 
-## Contact
-
-<div align="center">
-  <a href="https://yanevskiv.com" title="Website"><picture><source media="(prefers-color-scheme: dark)" srcset="res/icons/website-dark.svg"><img src="res/icons/website-light.svg" width="176" height="64" alt="Website"></picture></a>
-  <a href="https://www.linkedin.com/in/yanevskiv" title="LinkedIn"><picture><source media="(prefers-color-scheme: dark)" srcset="res/icons/linkedin-dark.svg"><img src="res/icons/linkedin-light.svg" width="176" height="64" alt="LinkedIn"></picture></a>
-  <a href="mailto:yanevskiv@gmail.com" title="Email"><picture><source media="(prefers-color-scheme: dark)" srcset="res/icons/mail-dark.svg"><img src="res/icons/mail-light.svg" width="176" height="64" alt="Email"></picture></a>
-</div>
