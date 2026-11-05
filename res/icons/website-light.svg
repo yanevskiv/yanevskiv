@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="176" height="64" viewBox="0 0 176 64" role="img" aria-labelledby="title">
+  <title id="title">Website</title>
+  <rect x="8.5" y="8.5" width="159" height="47" rx="8" fill="#ffffff" stroke="#d1d9e0" />
+  <g transform="translate(32 22) scale(0.833333)">
+    <g fill="none" stroke="#59636e" stroke-width="1.8">
+      <circle cx="12" cy="12" r="10" />
+      <ellipse cx="12" cy="12" rx="4.5" ry="10" />
+      <path d="M2 12h20M4 6.5h16M4 17.5h16" />
+    </g>
+  </g>
+  <text x="60" y="38" fill="#59636e" font-family="monospace" font-size="16" font-weight="bold" letter-spacing="-0.25">Website</text>
+</svg>

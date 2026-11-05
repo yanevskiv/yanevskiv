@@ -1,0 +1,18 @@
+{
+  "fdtd-cuda": {
+    "stars": 0,
+    "language": "C++"
+  },
+  "fdtd-openmp": {
+    "stars": 0,
+    "language": "C"
+  },
+  "ivcc": {
+    "stars": 1,
+    "language": "C"
+  },
+  "ivss": {
+    "stars": 0,
+    "language": "C"
+  }
+}

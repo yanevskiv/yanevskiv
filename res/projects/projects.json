@@ -1,0 +1,18 @@
+[
+  {
+    "repo": "fdtd-cuda",
+    "description": "2D electromagnetic wave simulation in C++20, with serial, OpenMP and CUDA backends."
+  },
+  {
+    "repo": "fdtd-openmp",
+    "description": "1D electromagnetic wave simulation in C, accelerated with OpenMP."
+  },
+  {
+    "repo": "ivcc",
+    "description": "A C99 compiler for x86-64 Linux, with an assembler, linker, emulator and C runtime."
+  },
+  {
+    "repo": "ivss",
+    "description": "An assembler, linker and emulator for a hypothetical 32-bit CPU."
+  }
+]

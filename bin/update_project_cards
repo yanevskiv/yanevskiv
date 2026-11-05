@@ -1,0 +1,92 @@
+#!/usr/bin/env python3
+"""Generate README project cards; --refresh fetches current GitHub metadata."""
+
+import argparse
+import base64
+import json
+import os
+from pathlib import Path
+import textwrap
+from urllib.request import Request, urlopen
+from xml.sax.saxutils import escape
+
+
+ROOT = Path(__file__).resolve().parent.parent
+ASSETS = ROOT / "res" / "projects"
+OWNER = "yanevskiv"
+THEMES = {
+    "light": ("#ffffff", "#d1d9e0", "#0969da", "#59636e"),
+    "dark": ("#0d1117", "#3d444d", "#58a6ff", "#9198a1"),
+}
+LANGUAGES = {"C": "#555555", "C++": "#f34b7d"}
+
+
+def fetch_metadata(projects):
+    headers = {"Accept": "application/vnd.github+json", "User-Agent": "profile-project-cards"}
+    if os.environ.get("GITHUB_TOKEN"):
+        headers["Authorization"] = "Bearer " + os.environ["GITHUB_TOKEN"]
+    metadata = {}
+    for project in projects:
+        repo = project["repo"]
+        request = Request(f"https://api.github.com/repos/{OWNER}/{repo}", headers=headers)
+        with urlopen(request, timeout=30) as response:
+            data = json.load(response)
+        metadata[repo] = {"stars": data["stargazers_count"], "language": data["language"]}
+    return metadata
+
+
+def card(project, metadata, theme):
+    background, border, title, text = THEMES[theme]
+    repo = project["repo"]
+    image = base64.b64encode((ASSETS / f"{repo}.jpg").read_bytes()).decode("ascii")
+    description = textwrap.wrap(project["description"], width=43)
+    if len(description) > 3:
+        raise ValueError(f"Description for {repo} exceeds three lines")
+    lines = "".join(
+        f'<tspan x="16" y="{186 + i * 17}">{escape(line)}</tspan>'
+        for i, line in enumerate(description)
+    )
+    language = metadata["language"] or "Code"
+    language_color = LANGUAGES.get(language, title)
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="350" height="260" viewBox="0 0 350 260" role="img" aria-labelledby="title description">
+  <title id="title">{escape(repo)}</title>
+  <desc id="description">{escape(project["description"])} {metadata["stars"]} stars. {escape(language)}.</desc>
+  <rect x="0.5" y="0.5" width="349" height="259" rx="8" fill="{background}" stroke="{border}"/>
+  <g font-family="monospace" font-size="12" fill="{text}">
+    <path d="M17 16h11v15H17z M20 16v15 M23 20h3 M23 23h3" fill="none" stroke="{text}"/>
+    <text x="38" y="29" fill="{title}" font-size="15" font-weight="bold">{escape(repo)}</text>
+    <g>
+      <animate attributeName="opacity" from="0" to="1" dur="0.45s" fill="freeze"/>
+      <image x="16" y="44" width="318" height="118" preserveAspectRatio="xMidYMid meet" xlink:href="data:image/jpeg;base64,{image}"/>
+      <text>{lines}</text>
+    </g>
+    <circle cx="21" cy="242" r="5" fill="{language_color}"/>
+    <text x="33" y="246">{escape(language)}</text>
+    <path d="m286 235 2 4 5 .7-3.5 3.4.8 4.8-4.3-2.3-4.3 2.3.8-4.8-3.5-3.4 5-.7z" fill="none" stroke="{text}"/>
+    <text x="302" y="246">{metadata["stars"]}</text>
+  </g>
+</svg>
+'''
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--refresh", action="store_true", help="Fetch current stars and languages from GitHub")
+    args = parser.parse_args()
+    projects = json.loads((ASSETS / "projects.json").read_text())
+    metadata_path = ASSETS / "metadata.json"
+    metadata = fetch_metadata(projects) if args.refresh else json.loads(metadata_path.read_text())
+    # Validate and render all cards before writing any files.
+    cards = {
+        ASSETS / f'{project["repo"]}-{theme}.svg': card(project, metadata[project["repo"]], theme)
+        for project in projects for theme in THEMES
+    }
+    if args.refresh:
+        metadata_path.write_text(json.dumps(metadata, indent=2) + "\n")
+    for path, svg in cards.items():
+        path.write_text(svg)
+    print(f"Generated {len(cards)} project cards")
+
+
+if __name__ == "__main__":
+    main()
