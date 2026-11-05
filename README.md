@@ -2,9 +2,9 @@
 
 ![Ivan's Github!](res/img/ivans-github.jpg)
 
-[![Ivan's LinkedIn](https://img.shields.io/badge/Ivan-LinkedIn-blue?style=for-the-badge)](https://www.linkedin.com/in/yanevskiv)
-[![Ivan's LinkedIn](https://img.shields.io/badge/Ivan-Website-brown?style=for-the-badge)](https://yanevskiv.com/)
 [![Ivan's LinkedIn](https://img.shields.io/badge/Ivan-Github-black?style=for-the-badge)](https://github.com/yanevskiv)
+[![Ivan's LinkedIn](https://img.shields.io/badge/Ivan-Website-brown?style=for-the-badge)](https://yanevskiv.com/)
+[![Ivan's LinkedIn](https://img.shields.io/badge/Ivan-LinkedIn-blue?style=for-the-badge)](https://www.linkedin.com/in/yanevskiv)
 
 </div>
 
